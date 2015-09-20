@@ -8,18 +8,75 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+private enum FlagMode: Int {
+    case Disabled = 0
+    case Enabled = 1
+}
+
+class ViewController: UIViewController, GameViewDelegate, GameObserver {
+
+    var game: Game?
+    @IBOutlet var gameView: GameView!
+    @IBOutlet var flagModeSelector: UISegmentedControl!
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view, typically from a nib.
+
+        game = Game(width: 24, height: 24, bombs: 99)
+        game?.addObserver(self)
+        gameView.tileSet = DefaultTileSet()
+        gameView.gameViewDelegate = self
+        gameView.game = game
     }
 
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Dispose of any resources that can be recreated.
+    @IBAction func flagModeChanged(sender: AnyObject?) {
+        if flagModeSelector.selectedSegmentIndex == FlagMode.Enabled.rawValue {
+            gameView.flagMode = true
+        } else {
+            gameView.flagMode = false
+        }
     }
 
+    // GameViewDelegate methods
 
+    func tileAt(location: Location) -> Tile {
+        if let game = self.game {
+            return game.tileAt(location)
+        } else {
+            return Tile(type: .Empty)
+        }
+    }
+
+    func bombsNear(location: Location) -> UInt {
+        return game?.bombsNear(location) ?? 0
+    }
+
+    func tilePressed(location: Location) {
+        if let tile = game?.tileAt(location) {
+            if tile.status == .Revealed && tile.type == .Empty {
+                game?.revealSafe(location)
+                return
+            }
+        }
+        if gameView.flagMode {
+            game?.toggleFlag(location)
+        } else {
+            game?.reveal(location)
+        }
+    }
+
+    // GameObserver methods
+
+    func tileStatusChanged(tile: Tile, location: Location) {
+        gameView.tileStatusChanged(tile, location: location)
+    }
+
+    func gameLost() {
+        gameView.gameLost()
+    }
+
+    func gameWon() {
+        gameView.gameWon()
+    }
 }
 

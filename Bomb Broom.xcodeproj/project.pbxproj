@@ -13,6 +13,13 @@
 		EA3B27A71B6FBCB300CA035D /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = EA3B27A61B6FBCB300CA035D /* Images.xcassets */; };
 		EA3B27AA1B6FBCB300CA035D /* LaunchScreen.xib in Resources */ = {isa = PBXBuildFile; fileRef = EA3B27A81B6FBCB300CA035D /* LaunchScreen.xib */; };
 		EA3B27B61B6FBCB300CA035D /* Bomb_BroomTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3B27B51B6FBCB300CA035D /* Bomb_BroomTests.swift */; };
+		EA3B27C11B6FBCE800CA035D /* Game.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3B27C01B6FBCE800CA035D /* Game.swift */; };
+		EA3B27C31B6FC37400CA035D /* RandomNumberGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3B27C21B6FC37400CA035D /* RandomNumberGenerator.swift */; };
+		EA3B27C71B70385300CA035D /* GameView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA3B27C61B70385300CA035D /* GameView.swift */; };
+		EA805F1C1B9E2BA400BF84DC /* GameViewDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA805F1B1B9E2BA400BF84DC /* GameViewDelegate.swift */; };
+		EA912EF01B9CB0260037968E /* GameTileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA912EEF1B9CB0260037968E /* GameTileView.swift */; };
+		EA912EF21B9CC0970037968E /* TileSet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA912EF11B9CC0970037968E /* TileSet.swift */; };
+		EA912EF41B9CCF240037968E /* MapFilter.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA912EF31B9CCF240037968E /* MapFilter.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,6 +43,13 @@
 		EA3B27AF1B6FBCB300CA035D /* Bomb BroomTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "Bomb BroomTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		EA3B27B41B6FBCB300CA035D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		EA3B27B51B6FBCB300CA035D /* Bomb_BroomTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bomb_BroomTests.swift; sourceTree = "<group>"; };
+		EA3B27C01B6FBCE800CA035D /* Game.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Game.swift; sourceTree = "<group>"; };
+		EA3B27C21B6FC37400CA035D /* RandomNumberGenerator.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RandomNumberGenerator.swift; sourceTree = "<group>"; };
+		EA3B27C61B70385300CA035D /* GameView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameView.swift; sourceTree = "<group>"; };
+		EA805F1B1B9E2BA400BF84DC /* GameViewDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameViewDelegate.swift; sourceTree = "<group>"; };
+		EA912EEF1B9CB0260037968E /* GameTileView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GameTileView.swift; sourceTree = "<group>"; };
+		EA912EF11B9CC0970037968E /* TileSet.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TileSet.swift; sourceTree = "<group>"; };
+		EA912EF31B9CCF240037968E /* MapFilter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MapFilter.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -77,6 +91,8 @@
 		EA3B279C1B6FBCB300CA035D /* Bomb Broom */ = {
 			isa = PBXGroup;
 			children = (
+				EA912EF31B9CCF240037968E /* MapFilter.swift */,
+				EA3B27BF1B6FBCBD00CA035D /* Game */,
 				EA3B279F1B6FBCB300CA035D /* AppDelegate.swift */,
 				EA3B27A11B6FBCB300CA035D /* ViewController.swift */,
 				EA3B27A31B6FBCB300CA035D /* Main.storyboard */,
@@ -110,6 +126,19 @@
 				EA3B27B41B6FBCB300CA035D /* Info.plist */,
 			);
 			name = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		EA3B27BF1B6FBCBD00CA035D /* Game */ = {
+			isa = PBXGroup;
+			children = (
+				EA3B27C01B6FBCE800CA035D /* Game.swift */,
+				EA3B27C21B6FC37400CA035D /* RandomNumberGenerator.swift */,
+				EA3B27C61B70385300CA035D /* GameView.swift */,
+				EA912EEF1B9CB0260037968E /* GameTileView.swift */,
+				EA912EF11B9CC0970037968E /* TileSet.swift */,
+				EA805F1B1B9E2BA400BF84DC /* GameViewDelegate.swift */,
+			);
+			path = Game;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -156,6 +185,7 @@
 		EA3B27921B6FBCB300CA035D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 0700;
 				LastUpgradeCheck = 0640;
 				ORGANIZATIONNAME = Tony;
 				TargetAttributes = {
@@ -213,7 +243,14 @@
 			buildActionMask = 2147483647;
 			files = (
 				EA3B27A21B6FBCB300CA035D /* ViewController.swift in Sources */,
+				EA912EF21B9CC0970037968E /* TileSet.swift in Sources */,
+				EA3B27C11B6FBCE800CA035D /* Game.swift in Sources */,
 				EA3B27A01B6FBCB300CA035D /* AppDelegate.swift in Sources */,
+				EA3B27C31B6FC37400CA035D /* RandomNumberGenerator.swift in Sources */,
+				EA912EF01B9CB0260037968E /* GameTileView.swift in Sources */,
+				EA912EF41B9CCF240037968E /* MapFilter.swift in Sources */,
+				EA3B27C71B70385300CA035D /* GameView.swift in Sources */,
+				EA805F1C1B9E2BA400BF84DC /* GameViewDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -409,6 +446,7 @@
 				EA3B27BB1B6FBCB300CA035D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 		EA3B27BC1B6FBCB300CA035D /* Build configuration list for PBXNativeTarget "Bomb BroomTests" */ = {
 			isa = XCConfigurationList;
@@ -417,6 +455,7 @@
 				EA3B27BE1B6FBCB300CA035D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
