@@ -8,7 +8,7 @@
 
 import Foundation
 
-struct RandomNumberGenerator: GeneratorType {
+struct RandomNumberGenerator: IteratorProtocol {
     typealias Element = UInt32
 
     let from: Element

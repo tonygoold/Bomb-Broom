@@ -9,28 +9,58 @@
 import UIKit
 
 private enum FlagMode: Int {
-    case Disabled = 0
-    case Enabled = 1
+    case disabled = 0
+    case enabled = 1
 }
 
 class ViewController: UIViewController, GameViewDelegate, GameObserver {
 
-    var game: Game?
     @IBOutlet var gameView: GameView!
+    @IBOutlet var bombsLeftLabel: UILabel!
     @IBOutlet var flagModeSelector: UISegmentedControl!
+
+    var game: Game? {
+        didSet {
+            updateBombsLeftLabel()
+        }
+    }
+
+    private func updateBombsLeftLabel() {
+        guard let game = game else {
+            bombsLeftLabel.text = ""
+            return
+        }
+
+        switch game.state {
+        case .initialized: fallthrough
+        case .running:
+            bombsLeftLabel.text = "\(game.bombs - game.flagCount)"
+        default:
+            bombsLeftLabel.text = ""
+        }
+    }
+
+    fileprivate func startNewGame() {
+        game = Game(width: 16, height: 16, bombs: 40)
+        game?.addObserver(self)
+        gameView.game = game
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        game = Game(width: 24, height: 24, bombs: 99)
-        game?.addObserver(self)
         gameView.tileSet = DefaultTileSet()
         gameView.gameViewDelegate = self
-        gameView.game = game
+
+        startNewGame()
     }
 
-    @IBAction func flagModeChanged(sender: AnyObject?) {
-        if flagModeSelector.selectedSegmentIndex == FlagMode.Enabled.rawValue {
+    @IBAction func newGamePressed(_ sender: AnyObject?) {
+        startNewGame()
+    }
+
+    @IBAction func flagModeChanged(_ sender: AnyObject?) {
+        if flagModeSelector.selectedSegmentIndex == FlagMode.enabled.rawValue {
             gameView.flagMode = true
         } else {
             gameView.flagMode = false
@@ -39,44 +69,43 @@ class ViewController: UIViewController, GameViewDelegate, GameObserver {
 
     // GameViewDelegate methods
 
-    func tileAt(location: Location) -> Tile {
-        if let game = self.game {
-            return game.tileAt(location)
-        } else {
-            return Tile(type: .Empty)
-        }
+    func tileAt(_ location: Location) -> Tile {
+        return game?.tileAt(location) ?? Tile(content: .empty)
     }
 
-    func bombsNear(location: Location) -> UInt {
+    func bombsNear(_ location: Location) -> UInt {
         return game?.bombsNear(location) ?? 0
     }
 
-    func tilePressed(location: Location) {
-        if let tile = game?.tileAt(location) {
-            if tile.status == .Revealed && tile.type == .Empty {
-                game?.revealSafe(location)
-                return
-            }
+    func tilePressed(_ location: Location) {
+        guard let game = game else {
+            return
         }
-        if gameView.flagMode {
-            game?.toggleFlag(location)
+
+        // Tapping on a revealed tile will reveal its unflagged neighbours,
+        // so long as all the neighbouring bombs have been flagged.
+        let tile = game.tileAt(location)
+        if tile.status == .revealed && tile.content == .empty {
+            game.revealSafeNeighbours(location)
+        } else if gameView.flagMode {
+            game.toggleFlag(location)
         } else {
-            game?.reveal(location)
+            game.reveal(location)
         }
     }
 
     // GameObserver methods
 
-    func tileStatusChanged(tile: Tile, location: Location) {
-        gameView.tileStatusChanged(tile, location: location)
+    func tileStatusChanged(_ game: Game, tile: Tile, location: Location) {
+        gameView.tileStatusChanged(game, tile: tile, location: location)
+        updateBombsLeftLabel()
     }
 
-    func gameLost() {
-        gameView.gameLost()
+    func gameLost(_ game: Game) {
+        gameView.gameLost(game)
     }
 
-    func gameWon() {
-        gameView.gameWon()
+    func gameWon(_ game: Game) {
+        gameView.gameWon(game)
     }
 }
-

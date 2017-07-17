@@ -9,10 +9,10 @@
 import UIKit
 
 protocol GameTileViewDelegate {
-    func tileAt(location: Location) -> Tile
-    func bombsNear(location: Location) -> UInt
+    func tileAt(_ location: Location) -> Tile
+    func bombsNear(_ location: Location) -> UInt
 
-    func tilePressed(location: Location)
+    func tilePressed(_ location: Location)
 }
 
 class GameTileView: UIView {
@@ -36,16 +36,16 @@ class GameTileView: UIView {
         self.rows = rows
         self.columns = columns
 
-        super.init(frame: CGRectMake(0.0, 0.0, CGFloat(columns) * GameTileView.tileSize, CGFloat(rows) * GameTileView.tileSize))
+        super.init(frame: CGRect(x: 0.0, y: 0.0, width: CGFloat(columns) * GameTileView.tileSize, height: CGFloat(rows) * GameTileView.tileSize))
 
-        self.userInteractionEnabled = true
+        self.isUserInteractionEnabled = true
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
 
-    func locationForPoint(point: CGPoint) -> Location? {
+    func locationForPoint(_ point: CGPoint) -> Location? {
         let viewSize = bounds.size
         let tileSize = GameTileView.tileSize
         switch (point.x, point.y) {
@@ -57,7 +57,7 @@ class GameTileView: UIView {
         }
     }
 
-    func rectForLocation(location: Location) -> CGRect? {
+    func rectForLocation(_ location: Location) -> CGRect? {
         switch (location.x, location.y) {
         case (self.location.x..<self.location.x + columns, self.location.y..<self.location.y + rows):
             let tileSize = GameTileView.tileSize
@@ -70,15 +70,15 @@ class GameTileView: UIView {
         }
     }
 
-    func tileStatusChanged(tile: Tile, location: Location) {
+    func tileStatusChanged(_ tile: Tile, location: Location) {
         if let rect = rectForLocation(location) {
             if rect.intersects(self.bounds) {
-                self.setNeedsDisplayInRect(rect)
+                self.setNeedsDisplay(rect)
             }
         }
     }
 
-    override func drawRect(rect: CGRect) {
+    override func draw(_ rect: CGRect) {
         let ctx = UIGraphicsGetCurrentContext()
 
         for y in 0..<rows {
@@ -86,86 +86,86 @@ class GameTileView: UIView {
                 let location = Location(x: x, y: y)
                 if let tileRect = rectForLocation(location) {
                     if tileRect.intersects(rect) {
-                        drawTileAt(location, inRect: tileRect, inContext: ctx)
+                        drawTileAt(location, inRect: tileRect, inContext: ctx!)
                     }
                 }
             }
         }
     }
 
-    func drawTileAt(location: Location, inRect rect: CGRect, inContext ctx: CGContext) {
-        CGContextSaveGState(ctx)
+    func drawTileAt(_ location: Location, inRect rect: CGRect, inContext ctx: CGContext) {
+        ctx.saveGState()
         if let tile = delegate?.tileAt(location) {
             switch tile.status {
-            case .Unknown:
+            case .unknown:
                 if location == pressingLocation && pressingInside {
                     tileSet?.drawPressedTile(rect, context: ctx)
                 } else {
                     tileSet?.drawUnknownTile(rect, context: ctx)
                 }
-            case .Flagged:
+            case .flagged:
                 tileSet?.drawFlaggedTile(rect, context: ctx)
-            case .Revealed:
+            case .revealed:
                 let count = delegate?.bombsNear(location) ?? 0
                 tileSet?.drawRevealedTile(rect, context: ctx, count: count)
-            case .Exploded:
+            case .exploded:
                 tileSet?.drawExplodedTile(rect, context: ctx)
             }
         } else {
-            CGContextSetGrayFillColor(ctx, 0.75, 1.0)
-            CGContextFillRect(ctx, rect)
-            CGContextSetGrayFillColor(ctx, 0.5, 1.0)
-            CGContextFillRect(ctx, CGRectInset(rect, 4.0, 4.0))
+            ctx.setFillColor(gray: 0.75, alpha: 1.0)
+            ctx.fill(rect)
+            ctx.setFillColor(gray: 0.5, alpha: 1.0)
+            ctx.fill(rect.insetBy(dx: 4.0, dy: 4.0))
         }
-        CGContextRestoreGState(ctx)
+        ctx.restoreGState()
     }
 
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        if let touch = touches.first as? UITouch {
-            pressingLocation = locationForPoint(touch.locationInView(self))
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first {
+            pressingLocation = locationForPoint(touch.location(in: self))
             if let location = pressingLocation {
                 pressingInside = true
                 if let rect = rectForLocation(location) {
-                    setNeedsDisplayInRect(rect)
+                    setNeedsDisplay(rect)
                 }
                 return
             }
         }
-        super.touchesBegan(touches, withEvent: event)
+        super.touchesBegan(touches, with: event)
     }
 
-    override func touchesMoved(touches: Set<NSObject>, withEvent event: UIEvent) {
-        if let touch = touches.first as? UITouch {
-            if let location = locationForPoint(touch.locationInView(self)) {
+    override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+        if let touch = touches.first {
+            if let location = locationForPoint(touch.location(in: self)) {
                 let isInside = location == pressingLocation
                 if isInside == pressingInside {
                     return
                 }
                 if let rect = rectForLocation(location) {
-                    setNeedsDisplayInRect(rect)
+                    setNeedsDisplay(rect)
                 }
                 pressingInside = isInside
                 return
             }
         }
-        super.touchesMoved(touches, withEvent: event)
+        super.touchesMoved(touches, with: event)
     }
 
-    override func touchesCancelled(touches: Set<NSObject>!, withEvent event: UIEvent!) {
+    override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let location = pressingLocation {
             if let rect = rectForLocation(location) {
-                setNeedsDisplayInRect(rect)
+                setNeedsDisplay(rect)
             }
             pressingLocation = nil
             return
         }
-        super.touchesCancelled(touches, withEvent: event)
+        super.touchesCancelled(touches, with: event)
     }
 
-    override func touchesEnded(touches: Set<NSObject>, withEvent event: UIEvent) {
+    override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         if let location = pressingLocation {
             if let rect = rectForLocation(location) {
-                setNeedsDisplayInRect(rect)
+                setNeedsDisplay(rect)
             }
             if pressingInside {
                 delegate?.tilePressed(location)
@@ -173,6 +173,6 @@ class GameTileView: UIView {
             pressingLocation = nil
             return
         }
-        super.touchesEnded(touches, withEvent: event)
+        super.touchesEnded(touches, with: event)
     }
 }

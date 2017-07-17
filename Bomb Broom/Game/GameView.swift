@@ -19,17 +19,17 @@ class GameView: UIScrollView, GameViewDelegate, GameObserver {
     var game: Game? {
         didSet {
             let tileSize = GameTileView.tileSize
-            if let game = self.game {
-                self.contentSize = CGSize(width: tileSize * CGFloat(game.width),
-                                          height: tileSize * CGFloat(game.height))
+            if let game = game {
+                contentSize = CGSize(width: tileSize * CGFloat(game.width),
+                    height: tileSize * CGFloat(game.height))
             } else {
-                self.contentSize = self.bounds.size
+                contentSize = bounds.size
             }
             for view in tileViews {
                 view.removeFromSuperview()
             }
-            tileViews.removeAll(keepCapacity: true)
-            self.setNeedsLayout()
+            tileViews.removeAll(keepingCapacity: true)
+            setNeedsLayout()
         }
     }
 
@@ -43,33 +43,38 @@ class GameView: UIScrollView, GameViewDelegate, GameObserver {
 
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.contentSize = self.bounds.size
-        self.clipsToBounds = true
-        self.bounces = false
+        contentSize = bounds.size
+        clipsToBounds = true
+        bounces = false
     }
 
-    required init(coder aDecoder: NSCoder) {
+    required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-        self.contentSize = self.bounds.size
-        self.clipsToBounds = true
-        self.bounces = false
+        contentSize = bounds.size
+        clipsToBounds = true
+        bounces = false
     }
 
     override func layoutSubviews() {
-        if let game = self.game {
-            if tileViews.count == 0 {
-                // One big tile!
-                let tile = GameTileView(location: Location(x: 0, y: 0), rows: game.height, columns: game.width)
-                tile.delegate = self
-                tile.tileSet = tileSet
-                tile.setNeedsDisplay()
-                tileViews.append(tile)
-                addSubview(tile)
-            }
+        guard let game = game else {
+            return
         }
+
+        // Only need to perform layout when the tiles have not been created yet
+        if tileViews.count > 0 {
+            return
+        }
+
+        // One big tile!
+        let tile = GameTileView(location: Location(x: 0, y: 0), rows: game.height, columns: game.width)
+        tile.delegate = self
+        tile.tileSet = tileSet
+        tile.setNeedsDisplay()
+        tileViews.append(tile)
+        addSubview(tile)
     }
 
-    func tileViewForLocation(location: Location) -> GameTileView? {
+    func tileViewForLocation(_ location: Location) -> GameTileView? {
         for tileView in tileViews {
             let tileLocation = tileView.location
             switch (location.x, location.y) {
@@ -85,39 +90,33 @@ class GameView: UIScrollView, GameViewDelegate, GameObserver {
 
     // GameTileViewDelegate methods
 
-    func tileAt(location: Location) -> Tile {
-        if let delegate = self.gameViewDelegate {
-            return delegate.tileAt(location)
-        } else {
-            return Tile(type: .Empty)
-        }
+    func tileAt(_ location: Location) -> Tile {
+        return gameViewDelegate?.tileAt(location) ?? Tile(content: .empty)
     }
 
-    func bombsNear(location: Location) -> UInt {
-        if let delegate = self.gameViewDelegate {
-            return delegate.bombsNear(location)
-        } else {
-            return 0
-        }
+    func bombsNear(_ location: Location) -> UInt {
+        return gameViewDelegate?.bombsNear(location) ?? 0
     }
 
-    func tilePressed(location: Location) {
+    func tilePressed(_ location: Location) {
         gameViewDelegate?.tilePressed(location)
     }
 
     // GameObserver methods
 
-    func tileStatusChanged(tile: Tile, location: Location) {
+    func tileStatusChanged(_ game: Game, tile: Tile, location: Location) {
         if let tileView = tileViewForLocation(location) {
             tileView.tileStatusChanged(tile, location: location)
         }
     }
 
-    func gameWon() {
-        println("Won!")
+    func gameWon(_ game: Game) {
+        // Unfinished
+        print("Won!")
     }
 
-    func gameLost() {
-        println("Lost...")
+    func gameLost(_ game: Game) {
+        // Unfinished
+        print("Lost...")
     }
 }
